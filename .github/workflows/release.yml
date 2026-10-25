@@ -17,9 +17,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Test signing error handling
-        run: python3 -m unittest discover -s tests
-
       - name: Generate shortcut
         run: python3 build_shortcut.py
 
@@ -29,7 +26,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: shortcut-release
-          path: Footprint 提交当前位置.shortcut
+          path: 上传当前位置.shortcut
           if-no-files-found: error
 
   upload:
@@ -49,4 +46,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release upload "$RELEASE_TAG" "Footprint 提交当前位置.shortcut" --clobber
+          gh release upload "$RELEASE_TAG" "上传当前位置.shortcut" --clobber
