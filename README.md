@@ -13,9 +13,9 @@
 
 ## 上报内容
 
-使用 `PUT /api/location` 和 `Authorization: Bearer <token>`, 以 JSON 提交 `longitude`, `latitude`, `city`, `datetime` 和 `device`.
+使用 `PUT /api/location` 和 `Authorization: Bearer <token>`, 以 JSON 提交 `longitude`, `latitude`, `altitude`, `city`, `timestamp` 和 `device`. 经纬度, 海拔和时间戳均为 JSON 数值.
 
-城市和坐标来自同一次定位, 系统未提供城市时为空字符串. 时间使用带时区的 ISO 8601 格式. 每次上报新增记录, 请求超时后应先检查是否已入库再重试.
+城市, 坐标和海拔来自同一次定位, 海拔单位为米, 系统未提供城市时为空字符串. 时间取定位完成时的系统时间, 转换为 Unix 毫秒整数, 不受设备时区影响. 每次上报新增记录, 请求超时后应先检查是否已入库再重试.
 
 ## 本地生成
 

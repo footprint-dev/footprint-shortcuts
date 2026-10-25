@@ -106,18 +106,45 @@ def build_shortcut():
         WFInput=position,
         WFContentItemPropertyName="Latitude",
     )
+    altitude = add(
+        "properties.locations",
+        "海拔",
+        WFInput=position,
+        WFContentItemPropertyName="Altitude",
+    )
     city = add(
         "properties.locations",
         "城市",
         WFInput=position,
         WFContentItemPropertyName="City",
     )
-    datetime = add(
-        "format.date",
-        "提交时间",
-        WFDate=text(observed_at),
-        WFDateFormatStyle="ISO 8601",
-        WFISO8601IncludeTime=True,
+    # Use an explicit UTC epoch so the device's time zone cannot shift the timestamp.
+    epoch = add(
+        "date",
+        "Unix 时间起点",
+        WFDateActionMode="Specified Date",
+        WFDateActionDate="1970-01-01T00:00:00Z",
+    )
+    seconds = add(
+        "gettimebetweendates",
+        "Unix 秒数",
+        WFTimeUntilFromDate=text(epoch),
+        WFInput=text(observed_at),
+        WFTimeUntilUnit="Seconds",
+    )
+    milliseconds = add(
+        "math",
+        "Unix 毫秒数",
+        WFInput=seconds,
+        WFMathOperation="\u00d7",
+        WFMathOperand="1000",
+    )
+    timestamp = add(
+        "round",
+        "毫秒时间戳",
+        WFInput=milliseconds,
+        WFRoundTo="Ones Place",
+        WFRoundMode="Always Round Down",
     )
     device = add("getdevicedetails", "设备名称", WFDeviceDetail="Device Name")
     response = add(
@@ -130,8 +157,9 @@ def build_shortcut():
         WFJSONValues=dictionary(
             ("longitude", text(longitude), 3),
             ("latitude", text(latitude), 3),
+            ("altitude", text(altitude), 3),
             ("city", text(city), 0),
-            ("datetime", text(datetime), 0),
+            ("timestamp", text(timestamp), 3),
             ("device", text(device), 0),
         ),
     )
