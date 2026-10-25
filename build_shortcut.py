@@ -146,6 +146,27 @@ def build_shortcut():
         WFRoundTo="Ones Place",
         WFRoundMode="Always Round Down",
     )
+    utc_offset = add(
+        "format.date",
+        "UTC 偏移",
+        WFDate=text(observed_at),
+        WFDateFormatStyle="Custom",
+        WFDateFormat="xx",
+    )
+    # Convert signed HHMM to hours, applying the sign to the minutes as well.
+    timezone_expression = add(
+        "text.replace",
+        "时区换算公式",
+        WFInput=text(utc_offset),
+        WFReplaceTextFind=r"^([+-])(\d{2})(\d{2})$",
+        WFReplaceTextReplace="0 $1 $2 $1 $3 / 60",
+        WFReplaceTextRegularExpression=True,
+    )
+    timezone = add(
+        "calculateexpression",
+        "时区小时偏移",
+        Input=text(timezone_expression),
+    )
     device = add("getdevicedetails", "设备名称", WFDeviceDetail="Device Name")
     response = add(
         "downloadurl",
@@ -160,6 +181,7 @@ def build_shortcut():
             ("altitude", text(altitude), 3),
             ("city", text(city), 0),
             ("timestamp", text(timestamp), 3),
+            ("timezone", text(timezone), 3),
             ("device", text(device), 0),
         ),
     )
