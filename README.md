@@ -37,23 +37,29 @@
 
 仓库保存 Python 源码、工作流和文档. 两种 `.shortcut` 产物均被 `.gitignore` 忽略, 本地文件仅用于调试, 安装文件通过 Release 分发.
 
-将源码推送到 GitHub 后, 手动创建并发布对应版本的 Release. [附件上传工作流](.github/workflows/release.yml) 收到 `release.published` 事件后, 在 Ubuntu runner 上依次执行:
+与前端仓库一致, [附件上传工作流](.github/workflows/release.yml) 在推送 `v*` tag 时触发, 也可以通过 `workflow_dispatch` 手动运行:
 
-1. 用 `build_shortcut.py` 生成未签名的 XML plist.
-2. 用 `sign_shortcut.py` 调用 Shortcuty 签名 API, 检查响应为 `AEA1` 文件后保存签名结果.
-3. 用 `gh release upload` 将 `Footprint 提交当前位置.shortcut` 上传到该 Release.
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
 
-Release 的创建、发布和发布说明由你管理. 仅推送标签不会触发此工作流. 工作流使用 GitHub 自动提供的 `GITHUB_TOKEN` 和上传附件所需的 `contents: write` 权限, 无需手动配置 Token. 生成或签名失败时不会执行上传; 重新运行会覆盖该 Release 中的同名附件.
+构建任务运行签名错误处理的回归测试, 生成并签名快捷指令, 将 `Footprint 提交当前位置.shortcut` 保存为 Actions artifact `shortcut-release`. 只有 tag 运行才会进入上传任务, 下载该 artifact 并使用 `gh release upload` 上传到同名 tag 对应的已有 Release.
+
+上传前需要你创建对应 Release, 可以先保持草稿; Release 的发布和发布说明由你管理. 如果上传时 Release 尚不存在, 创建后重新运行失败的上传任务即可. 在分支上手动运行只构建 Actions artifact. 上传任务单独使用 `contents: write` 权限和 GitHub 自动提供的 `GITHUB_TOKEN`; 重新运行会覆盖同名附件.
 
 GitHub 托管的 macOS runner 没有登录 iCloud, 无法直接使用需要该登录状态的 `shortcuts sign`. 因此工作流使用 Shortcuty 远程签名, 不依赖 runner 上的 Apple 账号. 参见 [shortcutkit 的签名环境说明](https://github.com/frontboat/shortcutkit) 和 [Shortcuty API 文档](https://github.com/Shortcuty/Signing-Server-API-Documentation).
 
 签名服务会收到生成的完整模板. 模板不包含真实服务地址和 Token, 这些配置在用户导入后填写. 服务不可用或返回无效文件时工作流会失败, 可在服务恢复后重新运行失败的任务.
+
+签名步骤的 HTTP 403 来自签名服务拒绝请求, 与 GitHub Release 上传权限无关. 脚本会输出状态码、响应类型、前 4096 字节响应正文和 `CF-Ray`, 用于区分服务接口报错与访问防护拦截. 如果服务持续拒绝 GitHub runner 的请求, 需由签名服务维护者排查和放行; 也可在已登录 iCloud 的 Mac 上按下文方式签名. 本地签名成功不能确认 GitHub runner 的请求也已被放行.
 
 ## 本地调试
 
 两个脚本只使用 Python 标准库. 在本目录运行与 CI 相同的生成和签名步骤:
 
 ```bash
+python3 -m unittest discover -s tests
 python3 build_shortcut.py
 python3 sign_shortcut.py
 ```
