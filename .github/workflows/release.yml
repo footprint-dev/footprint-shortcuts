@@ -1,0 +1,30 @@
+name: Upload release assets
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Generate shortcut
+        run: python3 build_shortcut.py
+
+      - name: Sign shortcut
+        run: python3 sign_shortcut.py
+
+      - name: Upload release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "$RELEASE_TAG" "Footprint 提交当前位置.shortcut" --clobber
