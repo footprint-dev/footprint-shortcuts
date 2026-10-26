@@ -34,9 +34,9 @@ def sign_shortcut(source, destination):
 
 if __name__ == "__main__":
     root = Path(__file__).parent
-    destination = root / "上传当前位置.shortcut"
+    destination = root / "upload-location.shortcut"
     try:
-        sign_shortcut(root / "上传当前位置.unsigned.shortcut", destination)
+        sign_shortcut(root / "upload-location.unsigned.shortcut", destination)
     except (RuntimeError, ValueError) as error:
         raise SystemExit(str(error)) from None
     print(f"已签名: {destination}")

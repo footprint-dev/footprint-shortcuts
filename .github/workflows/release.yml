@@ -26,7 +26,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         with:
           name: shortcut-release
-          path: 上传当前位置.shortcut
+          path: upload-location.shortcut
           if-no-files-found: error
 
   upload:
@@ -46,4 +46,4 @@ jobs:
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          gh release upload "$RELEASE_TAG" "上传当前位置.shortcut" --clobber
+          gh release upload "$RELEASE_TAG" "upload-location.shortcut" --clobber

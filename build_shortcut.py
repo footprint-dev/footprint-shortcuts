@@ -231,6 +231,6 @@ def build_shortcut():
 
 
 if __name__ == "__main__":
-    path = Path(__file__).parent / "上传当前位置.unsigned.shortcut"
+    path = Path(__file__).parent / "upload-location.unsigned.shortcut"
     path.write_bytes(plistlib.dumps(build_shortcut(), sort_keys=False))
     print(f"已生成: {path}")

@@ -4,7 +4,7 @@
 
 ## 安装配置
 
-1. 从 GitHub Releases 下载 `上传当前位置.shortcut`, 保存到 iPhone 的"文件"中, 点击添加.
+1. 从 GitHub Releases 下载 `upload-location.shortcut`, 保存到 iPhone 的"文件"中, 点击添加.
 2. 打开快捷指令编辑页面, 在顶部第一个"文本"操作中填写完整接口地址, 例如 `https://footprint.example.com/api/location`, 必须包含 `/api/location`.
 3. 在第二个"文本"操作中填写后端 `config.toml` 的 `server.ingest_token`, 不加 `Bearer ` 前缀, 然后保存.
 4. 手动运行一次, 允许访问位置和服务器, 并开启"精确位置".
@@ -28,7 +28,7 @@ python3 build_shortcut.py
 python3 sign_shortcut.py
 ```
 
-生成的 `上传当前位置.unsigned.shortcut` 用于查看内容, `上传当前位置.shortcut` 用于安装. 修改源码后需重新生成并签名.
+生成的 `upload-location.unsigned.shortcut` 用于查看内容, `upload-location.shortcut` 用于安装. 修改源码后需重新生成并签名.
 
 ## Release 上传
 
